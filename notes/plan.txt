@@ -1,0 +1,6 @@
+One gift giving session.
+Users will belong to many sessions.
+Users will have gifts but they won't be able to see their own gifts.
+Users can vote on other gift ideas for other people.
+Users can submit gift ideas via link and description.
+Winning gift gets saved. 
