@@ -19,5 +19,7 @@ class User < ApplicationRecord
   has_many :comments
   has_many :votes
 
+  validates :name, presence: true
+
 
 end
