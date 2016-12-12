@@ -1,3 +1,85 @@
-<h1>Welcome to Secretest Santa <%=current_user.name%>, hope you get some awesome presents!</h1>
-<br>
-<img src="<%=current_user.profile%>" alt="profile_picture">
+<% if current_user.name == nil %>
+
+  <h2>Looks like you have some info to fill out to get started.</h2>
+  <%= form_for(@user) do |f| %>
+    <div class="field">
+      <%= f.label :name %><br>
+      <%= f.text_field :name %>
+    </div>
+    <div class="field">
+      <%= f.label :profile, 'Picture link (use direct image link)' %><br>
+      <%= f.text_field :profile %>
+    </div>
+    <div class="actions">
+      <%= f.submit 'Update your info'%>
+    </div>
+  <% end %>
+
+<% else %>
+
+  <h1>Welcome to Secretest Santa <%=current_user.name%>, hope you get some awesome presents!</h1>
+  <br>
+  <% if current_user.profile %>
+    <img id="hi" src="<%=current_user.profile%>" alt="profile_picture" height="64" width="64">
+  <% end %>
+
+<% end %>
+
+<% if current_user.periods.empty? %>
+
+  <div id="hide_here">
+
+  <h2>It looks like you have no events set up.</h2>
+  <%= form_for(@period, html: {id: :new_period}) do |f| %>
+    <div class="field">
+      <%= f.label :title %><br>
+      <%= f.text_field :title %>
+    </div>
+    <div class="field">
+      <%= f.label :expiration, "Enter a number of weeks from 1-8 that you'd like the event to go on for." %><br>
+      <%= f.number_field :expiration %>
+    </div>
+    <div class="field">
+      <%= f.label :price_limit %><br>
+      <%= f.number_field :price_limit %>
+    </div>
+    <div class="actions">
+      <%= f.submit 'Submit a new event.'%>
+    </div>
+  <% end %>
+</div>
+
+<% else %>
+  <br>
+  <% current_user.periods.each do |event| %>
+  <a href="/periods/<%=event.id%>"><%= event.title %></a>
+    <h3><%= event.title %></h3>
+    <h4><%= event.expiration %> weeks left.</h4>
+  <% end %>
+
+<% end %>
+
+<div id="periodResult">
+  <h2 id="periodTitle"></h2>
+  <p id="periodExpiration"></p>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  $(function () {
+    $('#new_period').submit(function(event) {
+      //prevent form from submitting the default way
+      event.preventDefault();
+
+      var values = $(this).serialize();
+
+      var posting = $.post('/periods', values);
+
+      posting.done(function(data) {
+        var period = data;
+        $("#periodTitle").text(period["title"]);
+        $("#periodExpiration").text(period["expiration"] + " weeks left.");
+        $("#hide_here").hide();
+      });
+    });
+  });
+</script>

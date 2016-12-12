@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
+  get 'users/update'
+
   get 'static/home'
   root 'static#home'
+
+  # post 'users/:id', to: 'static#update'
 
   resources :periods
 

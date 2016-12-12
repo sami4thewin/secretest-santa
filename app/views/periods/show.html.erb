@@ -1,0 +1,29 @@
+<h1><%=@period.title%></h1>
+<% @period.users.each do |u| %>
+<%= u.name %>
+<% end %>
+
+<div id="periodResult">
+  <h2 id="periodTitle"></h2>
+  <p id="periodExpiration"></p>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  $(function () {
+    $('#new_period').submit(function(event) {
+      //prevent form from submitting the default way
+      event.preventDefault();
+
+      var values = $(this).serialize();
+
+      var posting = $.post('/periods', values);
+
+      posting.done(function(data) {
+        var period = data;
+        $("#periodTitle").text(period["title"]);
+        $("#periodExpiration").text(period["expiration"] + " weeks left.");
+        $("#hide_here").hide();
+      });
+    });
+  });
+</script>
