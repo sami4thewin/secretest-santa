@@ -15,9 +15,36 @@
             <div class="prospectData" data-prospect="<%=gift.id%>">
 
               <a href="<%=gift.link%>" target="_blank">Here is a link to <%=gift.description%> which is <%=gift.price%> dollars.</a>
-              <h4><%=gift.description%> currently has <%=gift.votes.sum(:tally)%> vote(s), you can vote below.</h4>
+              <h4><%=gift.description%> currently has <%=gift.votes.sum(:tally)%> vote(s), you can vote or leave a comment below.</h4>
 
               <img src="http://www.clipartkid.com/images/721/wrapped-christmas-presents-wrapped-christmas-present-jpg-fy6Ii2-clipart.jpg" alt="upvote" height="32" width="32" data-vote="<%=gift.id%>" data-img="<%=current_user.id%>">   <img src="http://thehanovertheatre.org/images/header_image/1440432004_h_grinch900x650.jpg" alt="downvote" height="32" width="32" data-vote="<%=gift.id%>" data-img="<%=current_user.id%>">
+
+              <br>
+              <br>
+
+              <%= form_for(@comment, html: {class: :new_comment}) do |f| %>
+              <div class="field">
+                <%= f.text_field :text %>
+              </div>
+              <div class="field">
+                <%= f.hidden_field :user_id, :value => current_user.id %>
+              </div>
+              <div class="field">
+                <%= f.hidden_field :gift_id, :value => gift.id %>
+              </div>
+              <div class="actions">
+                <%= f.submit 'Submit this comment.' %>
+              </div>
+              <% end %>
+
+              <div id="comments_<%=gift.id%>">
+                <% gift.comments.each do |comment| %>
+                  <h5><%=comment.user.name%> says <%=comment.text%>.</h5>
+                <% end %>
+              </div>
+
+
+
             </div>
         <% end %>
     <% end %>
@@ -75,7 +102,9 @@
 <% end %>
 
 <script type="text/javascript" charset="utf-8">
+
   $(function () {
+
     $(".js-get").hide();
 
     $('.prospectData').hide();
@@ -98,18 +127,6 @@
       });
     });
 
-    $(".new_gift").submit(function(event) {
-      event.preventDefault();
-      var values = $(this).serialize();
-      var posting = $.post("/gifts", values);
-      // debugger;
-      posting.done(function(response){
-        // var gift = new Gift(response)
-        // gift.appendToPage()
-        $(`#gifts_${response.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${response.id}">${response.description}</button>`);
-
-      })
-    });
 
     $('.prospectShow').on("click", function() {
       $('.prospectData').hide();
@@ -141,18 +158,87 @@
       alert("Successfully downvoted, rude...");
     });
 
+    $('.new_comment').submit(function(event) {
+      event.preventDefault();
+      var values = $(this).serialize();
+      var comment = $.post("/comments", values);
+      // debugger;
+      comment.done(function(response) {
+        // debugger;
+        t = response.text;
+        gift = response.gift_id;
+        var guy = $.get(`/users/${response.user_id}`);
 
-  });
+        guy.done(function(response) {
+          // debugger;
+          $(`#comments_${gift}`).append(`<h5>${response.name} says ${t}.</h5>`);
+          alert("Added your comment!");
+        });
+
+
+        // $(`#comments_`)
+      });
+    });
+
+    $(".new_gift").submit(function(event) {
+      event.preventDefault();
+      var values = $(this).serialize();
+      var posting = $.post("/gifts", values);
+      posting.done(function(response){
+        // debugger;
+        var gif = new Gift(response)
+        gif.appendToPage()
+        // $(`#gifts_${response.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${response.id}">${response.description}</button>`);
+        alert("Added your gift!");
+      });
+    });
+
+});
+
+    function Gift (response) {
+      this.description = response.description;
+      this.id = response.id;
+      this.link = response.link;
+      this.price = response.price;
+      this.recipient_id = response.recipient_id;
+      this.user_id = response.user_id;
+    }
+
+    Gift.prototype.appendToPage = function() {
+      $(`#gifts_${this.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${this.id}">${this.description}</button>`);
+    }
+
+    // class Gift(){
+    //   constructor(response){
+    //     this.description = response.description;
+    //     this.id = response.id;
+    //     this.link = response.link;
+    //     this.price = response.price;
+    //     this.recipient_id = response.recipient_id;
+    //     this.user_id = response.user_id;
+    //   };
+    // }
+    //
+    // Gift.prototype.appendToPage = function(){
+    //   $(`#gifts_${this.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${this.id}">${this.description}</button>`);
+    // }
+
 
   // class Gift(){
   //   constructor(response){
-  //     this.description = response.description
-  //   }
+  //     this.description = response.description;
+  //     this.id = response.id;
+  //     this.link = response.link;
+  //     this.price = response.price;
+  //     this.recipient_id = response.recipient_id;
+  //     this.user_id = response.user_id;
+  //   };
   //
   //   appendToPage(){
-  //
-  //   }
+  //     $(`#gifts_${this.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${this.id}">${this.description}</button>`);
+  //   };
   // }
+
   // Gift.prototype.appendToPage = function(){
   //   some stuff
   // }

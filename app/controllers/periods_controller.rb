@@ -12,6 +12,7 @@ class PeriodsController < ApplicationController
     # binding.pry
     @period = Period.find(params[:id])
     @gift = Gift.new
+    @comment = Comment.new
   end
 
   def index

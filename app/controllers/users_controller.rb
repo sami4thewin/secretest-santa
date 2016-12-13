@@ -11,4 +11,10 @@ class UsersController < ApplicationController
     # binding.pry
   end
 
+  def show
+    # binding.pry
+    @user = User.find(params[:id])
+    render json: @user, status: 201
+  end
+
 end
