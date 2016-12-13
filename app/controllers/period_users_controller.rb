@@ -1,0 +1,5 @@
+class PeriodUsersController < ApplicationController
+
+  
+
+end

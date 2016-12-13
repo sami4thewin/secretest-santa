@@ -1,31 +1,26 @@
 <h1><%=@period.title%></h1>
 <br>
 <h2>Here are the users who are participating in this event.</h2>
+<div class="users">
+
 <% @period.users.each do |u| %>
 <%= u.name %>
 <% end %>
+
+</div>
 <br>
 <br>
 <% if !@period.users.include?(current_user) %>
-  <a href="<%=current_user.id%>" id="<%=@period.id%>">Click here to join this event!</a>
+  <button class="js-more" data-id="<%= @period.id %>" data-type="<%=current_user.id%>">Click here to join this event.</button>
 <% end %>
 
 <script type="text/javascript" charset="utf-8">
   $(function () {
-    $('#new_period').submit(function(event) {
-      //prevent form from submitting the default way
-      event.preventDefault();
 
-      var values = $(this).serialize();
+    $(".js-more").on("click", function(event) {
+      debugger;
+      var id = $(this).data("id");
 
-      var posting = $.post('/periods', values);
-
-      posting.done(function(data) {
-        var period = data;
-        $("#periodTitle").text(period["title"]);
-        $("#periodExpiration").text(period["expiration"] + " weeks left.");
-        $("#hide_here").hide();
-      });
     });
   });
 </script>

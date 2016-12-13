@@ -6,7 +6,12 @@ Rails.application.routes.draw do
 
   # post 'users/:id', to: 'static#update'
 
+  resources :period_users
+  resources :votes
+  resources :comments
+  resources :gifts
   resources :periods
+
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

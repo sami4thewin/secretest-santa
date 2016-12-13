@@ -1,5 +1,5 @@
 class PeriodsController < ApplicationController
-
+  protect_from_forgery
   def create
     # binding.pry
     @period = Period.new(period_params)
@@ -16,6 +16,13 @@ class PeriodsController < ApplicationController
   def index
     # binding.pry
     @periods = Period.all
+  end
+
+  def destroy
+    # binding.pry
+    @period = Period.find(params[:id])
+    @period.destroy
+
   end
 
 
