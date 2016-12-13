@@ -8,9 +8,15 @@
   <% if u != current_user %>
 
   <div id="gifts_<%=u.id%>">
-    <% if !u.gifts.empty? %>
-        <% u.gifts.each do |gift| %>
-          <button type="button" data-gift="<%=gift.id%>"><%=gift.description%></button>
+    <% if !u.prospects.empty? %>
+    <h4>Gift suggestions for <%=u.name%>.</h4>
+        <% u.prospects.each do |gift| %>
+          <button type="button" class="prospectShow" data-gift="<%=gift.id%>"><%=gift.description%></button>
+            <div class="prospectData" data-prospect="<%=gift.id%>">
+
+              <a href="<%=gift.link%>" target="_blank">Here is a link to <%=gift.description%> which is <%=gift.price%> dollars.</a>
+
+            </div>
         <% end %>
     <% end %>
   </div>
@@ -21,7 +27,7 @@
 
       <div id="hide_here_<%=u.id%>">
 
-      <%= form_for(@gift, html: {id: :new_gift}) do |f| %>
+      <%= form_for(@gift, html: {class: :new_gift}) do |f| %>
         <div class="field">
           <%= f.label :link %><br>
           <%= f.text_field :link %>
@@ -70,6 +76,8 @@
   $(function () {
     $(".js-get").hide();
 
+    $('.prospectData').hide();
+
     $('.name').on("click", function() {
       var id = $(this).data("id");
       $(`[data-user=${id}]`).show();
@@ -88,7 +96,7 @@
       });
     });
 
-    $("#new_gift").submit(function(event) {
+    $(".new_gift").submit(function(event) {
       event.preventDefault();
       var values = $(this).serialize();
       var posting = $.post("/gifts", values);
@@ -96,9 +104,14 @@
       posting.done(function(response){
         // var gift = new Gift(response)
         // gift.appendToPage()
-        $(`#gifts_${response.recipient_id}`).append(`<button type="button" data-gift="${response.id}">${response.description}</button>`);
+        $(`#gifts_${response.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${response.id}">${response.description}</button>`);
 
       })
+    });
+
+    $('.prospectShow').on("click", function() {
+      var id = $(this).data("gift");
+      $(`[data-prospect=${id}]`).show();
     });
 
   });

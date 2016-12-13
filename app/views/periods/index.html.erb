@@ -1,4 +1,31 @@
 <% @periods.each do |period| %>
-<a href="/periods/<%=period.id%>"><%= period.title %></a>
 
+  <% if period.users.include?(current_user) %>
+    <a href="/periods/<%=period.id%>">You're already part of <%= period.title %>.</a>
+    <br>
+  <% else %>
+    <button class="js-more" data-id="<%= period.id %>" data-type="<%=current_user.id%>">Click here to join <%=period.title%>.</button>
+  <br>
+  <% end %>
+  <br>
 <% end %>
+
+
+<script type="text/javascript" charset="utf-8">
+
+  $(function() {
+
+    $(".js-more").on("click", function(event) {
+
+      var id = $(this).data("id");
+      var user = $(this).data("type");
+      $.ajax({
+        type: "POST",
+        url: '/period_users',
+        data: {'period_id': `${id}`, 'user_id': `${user}`}
+      });
+    });
+
+  });
+
+</script>

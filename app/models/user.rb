@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :gifts
   has_many :comments
   has_many :votes
+  has_many :prospects, class_name: "Gift", foreign_key: "recipient_id"
 
   # validates :name, presence: true
 
