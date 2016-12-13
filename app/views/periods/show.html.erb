@@ -1,15 +1,17 @@
 <h1><%=@period.title%></h1>
-<br>
-<h2>Here are the users who are participating in this event.</h2>
+  <br>
+  <h2>Here are the users who are participating in this event.</h2>
 <div class="users">
 
 <% @period.users.each do |u| %>
-<%= u.name %>
+  <%= u.name %>
+  <br>
 <% end %>
 
 </div>
 <br>
 <br>
+
 <% if !@period.users.include?(current_user) %>
   <button class="js-more" data-id="<%= @period.id %>" data-type="<%=current_user.id%>">Click here to join this event.</button>
 <% end %>
@@ -20,6 +22,12 @@
     $(".js-more").on("click", function(event) {
       debugger;
       var id = $(this).data("id");
+      var user = $(this).data("type");
+      $.ajax({
+        type: "POST",
+        url: '/period_users',
+        data: {'period_id': `${id}`, 'user_id': `${user}`}
+      });
 
     });
   });
