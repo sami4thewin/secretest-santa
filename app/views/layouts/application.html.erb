@@ -26,7 +26,6 @@
           <li><%= link_to 'Sign out', destroy_user_session_path, :method=>'delete' %></li>
           <li><%= link_to 'Your homepage', '/' %></li>
           <li><%= link_to "All Periods", periods_path %></li>
-          <li><%= link_to "Your Gifts", "users/#{current_user.id}/gifts" %></li>
           <% else %>
           <h2>Secretest Santa</h2>
         <% end %>

@@ -32,6 +32,7 @@ gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'require_all'
 gem 'bootstrap-sass', '~> 3.2.0'
+gem 'whenever', :require => false
 gem 'active_model_serializers'
 
 # Use Capistrano for deployment

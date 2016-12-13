@@ -23,6 +23,8 @@ class PeriodsController < ApplicationController
   def destroy
     # binding.pry
     @period = Period.find(params[:id])
+    
+
     @period.destroy
 
   end
