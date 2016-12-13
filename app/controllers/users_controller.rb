@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
 
+  protect_from_forgery
+
   def update
     @user = current_user
     @user.name = params['user']['name']

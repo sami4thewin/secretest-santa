@@ -15,7 +15,9 @@
             <div class="prospectData" data-prospect="<%=gift.id%>">
 
               <a href="<%=gift.link%>" target="_blank">Here is a link to <%=gift.description%> which is <%=gift.price%> dollars.</a>
-
+              <h4>Click either the upvote or downvote to vote for this gift.</h4>
+              <%binding.pry%>
+              <img src="http://www.clipartkid.com/images/721/wrapped-christmas-presents-wrapped-christmas-present-jpg-fy6Ii2-clipart.jpg" alt="upvote" height="32" width="32" data-vote="<%=gift.id%>" data-img="<%=current_user.id%>">   <img src="http://thehanovertheatre.org/images/header_image/1440432004_h_grinch900x650.jpg" alt="downvote" height="32" width="32" data-vote="<%=gift.id%>" data-img="<%=current_user.id%>">
             </div>
         <% end %>
     <% end %>
@@ -110,9 +112,33 @@
     });
 
     $('.prospectShow').on("click", function() {
+      $('.prospectData').hide();
       var id = $(this).data("gift");
       $(`[data-prospect=${id}]`).show();
     });
+
+    $('[src="http://www.clipartkid.com/images/721/wrapped-christmas-presents-wrapped-christmas-present-jpg-fy6Ii2-clipart.jpg"]').on("click", function() {
+      // debugger;
+      var gift = $(this).data("vote");
+      var user = $(this).data("img");
+      $.ajax({
+        type: "POST",
+        url: '/votes',
+        data: {'gift_id': `${gift}`, 'user_id': `${user}`, 'tally': '1'}
+      });
+    });
+
+    $('[src="http://thehanovertheatre.org/images/header_image/1440432004_h_grinch900x650.jpg"]').on("click", function() {
+      // debugger;
+      var gift = $(this).data("vote");
+      var user = $(this).data("img");
+      $.ajax({
+        type: "POST",
+        url: '/votes',
+        data: {'gift_id': `${gift}`, 'user_id': `${user}`, 'tally': '-1'}
+      });
+    });
+
 
   });
 
