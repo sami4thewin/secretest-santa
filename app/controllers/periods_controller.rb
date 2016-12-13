@@ -9,7 +9,7 @@ class PeriodsController < ApplicationController
   end
 
   def show
-
+    # binding.pry
     @period = Period.find(params[:id])
   end
 

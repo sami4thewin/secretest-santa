@@ -1,12 +1,14 @@
 <h1><%=@period.title%></h1>
+<br>
+<h2>Here are the users who are participating in this event.</h2>
 <% @period.users.each do |u| %>
 <%= u.name %>
 <% end %>
-
-<div id="periodResult">
-  <h2 id="periodTitle"></h2>
-  <p id="periodExpiration"></p>
-</div>
+<br>
+<br>
+<% if !@period.users.include?(current_user) %>
+  <a href="<%=current_user.id%>" id="<%=@period.id%>">Click here to join this event!</a>
+<% end %>
 
 <script type="text/javascript" charset="utf-8">
   $(function () {
