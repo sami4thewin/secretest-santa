@@ -6,7 +6,7 @@ class PeriodUsersController < ApplicationController
     # binding.pry
     @user = User.find(params[:user_id])
     @period = Period.find(params[:period_id])
-    @period.users << current_user
+    @period.users << @user
   end
 
 end

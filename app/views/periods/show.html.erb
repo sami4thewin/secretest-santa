@@ -6,9 +6,48 @@
 <% @period.users.each do |u| %>
 
   <% if u != current_user %>
-    <div class="js-get" data-id="<%=u.id%>">
 
-      <%= u.name %>
+  <div id="gifts_<%=u.id%>">
+    <% if !u.gifts.empty? %>
+        <% u.gifts.each do |gift| %>
+          <button type="button" data-gift="<%=gift.id%>"><%=gift.description%></button>
+        <% end %>
+    <% end %>
+  </div>
+
+
+  <h4 class="name" data-id="<%=u.id%>">Add a gift for <%= u.name %>.</h4>
+    <div class="js-get" data-user="<%=u.id%>">
+
+      <div id="hide_here_<%=u.id%>">
+
+      <%= form_for(@gift, html: {id: :new_gift}) do |f| %>
+        <div class="field">
+          <%= f.label :link %><br>
+          <%= f.text_field :link %>
+        </div>
+        <div class="field">
+          <%= f.label :description %><br>
+          <%= f.text_field :description %>
+        </div>
+        <div class="field">
+          <%= f.label :price %><br>
+          <%= f.number_field :price %>
+        </div>
+        <div class="field">
+          <%= f.hidden_field :user_id, :value => current_user.id %>
+        </div>
+        <div class="field">
+          <%= f.hidden_field :recipient_id, :value => u.id %>
+        </div>
+        <div class="actions">
+          <%= f.submit 'Submit a new gift.'%>
+        </div>
+      <% end %>
+      </div>
+
+
+
 
     </div>
   <% else %>
@@ -29,9 +68,17 @@
 
 <script type="text/javascript" charset="utf-8">
   $(function () {
+    $(".js-get").hide();
+
+    $('.name').on("click", function() {
+      var id = $(this).data("id");
+      $(`[data-user=${id}]`).show();
+
+    })
+
 
     $(".js-more").on("click", function(event) {
-      debugger;
+
       var id = $(this).data("id");
       var user = $(this).data("type");
       $.ajax({
@@ -40,5 +87,32 @@
         data: {'period_id': `${id}`, 'user_id': `${user}`}
       });
     });
+
+    $("#new_gift").submit(function(event) {
+      event.preventDefault();
+      var values = $(this).serialize();
+      var posting = $.post("/gifts", values);
+      // debugger;
+      posting.done(function(response){
+        // var gift = new Gift(response)
+        // gift.appendToPage()
+        $(`#gifts_${response.recipient_id}`).append(`<button type="button" data-gift="${response.id}">${response.description}</button>`);
+
+      })
+    });
+
   });
+
+  // class Gift(){
+  //   constructor(response){
+  //     this.description = response.description
+  //   }
+  //
+  //   appendToPage(){
+  //
+  //   }
+  // }
+  // Gift.prototype.appendToPage = function(){
+  //   some stuff
+  // }
 </script>

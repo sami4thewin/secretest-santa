@@ -1,6 +1,7 @@
 class Gift < ApplicationRecord
 
   belongs_to :user
+  #belongs to user but a recipient use a foreign key, recipient id
 
   has_many :comments
   has_many :votes
