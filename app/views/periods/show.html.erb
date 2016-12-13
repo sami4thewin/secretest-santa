@@ -4,7 +4,18 @@
 <div class="users">
 
 <% @period.users.each do |u| %>
-  <%= u.name %>
+
+  <% if u != current_user %>
+    <div class="js-get" data-id="<%=u.id%>">
+
+      <%= u.name %>
+
+    </div>
+  <% else %>
+    <h4>And you...</h4>
+  <% end %>
+
+
   <br>
 <% end %>
 
@@ -28,7 +39,6 @@
         url: '/period_users',
         data: {'period_id': `${id}`, 'user_id': `${user}`}
       });
-
     });
   });
 </script>
