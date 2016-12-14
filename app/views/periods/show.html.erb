@@ -1,7 +1,18 @@
-<h1><%=@period.title%></h1>
+<% if !@period.users.include?(current_user) %>
+
+
+  <button class="js-more" data-id="<%= @period.id %>" data-type="<%=current_user.id%>">Click here to join <%=@period.title%>.</button>
+<% end %>
+
+
+
+<h1><%=@period.title%> has a price limit of $<%=@period.price_limit%>.</h1>
   <br>
   <h3><%=@period.time_left%></h3>
   <br>
+
+<% if @period.users.include?(current_user) %>
+
   <h2>Here are the users who are participating in this event.</h2>
 <div class="users">
 
@@ -14,11 +25,12 @@
     <h4>Gift suggestions for <%=u.name%>.</h4>
         <% u.prospects.each do |gift| %>
           <% if @period.gifts.include?(gift) %>
-            <button type="button" class="prospectShow" data-gift="<%=gift.id%>"><%=gift.description%></button>
+            <button type="button" class="prospectShow" data-gift="<%=gift.id%>"><%=gift.description%></button> <br> <br>
               <div class="prospectData" data-prospect="<%=gift.id%>">
 
-                <a href="<%=gift.link%>" target="_blank">Here is a link to <%=gift.description%> which is <%=gift.price%> dollars.</a>
-                <h4><%=gift.description%> currently has <%=gift.votes.sum(:tally)%> vote(s), you can vote or leave a comment below.</h4>
+                <div id="comments_<%=gift.id%>">
+                  <h4>Here's what people are saying about this gift...</h4><br>
+                </div>
 
                 <img src="http://www.clipartkid.com/images/721/wrapped-christmas-presents-wrapped-christmas-present-jpg-fy6Ii2-clipart.jpg" alt="upvote" height="32" width="32" data-vote="<%=gift.id%>" data-img="<%=current_user.id%>">   <img src="http://thehanovertheatre.org/images/header_image/1440432004_h_grinch900x650.jpg" alt="downvote" height="32" width="32" data-vote="<%=gift.id%>" data-img="<%=current_user.id%>">
 
@@ -40,13 +52,8 @@
                 </div>
                 <% end %>
 
-                <div id="comments_<%=gift.id%>">
-                  <% gift.comments.each do |comment| %>
-                    <h5><%=comment.user.name%> says <%=comment.text%>.</h5>
-                  <% end %>
-                </div>
 
-
+                <br><br>
 
               </div>
             <% end %>
@@ -71,7 +78,7 @@
         </div>
         <div class="field">
           <%= f.label :price %><br>
-          <%= f.number_field :price %>
+          <%= f.number_field :price, max: @period.price_limit %>
         </div>
         <div class="field">
           <%= f.hidden_field :user_id, :value => current_user.id %>
@@ -104,150 +111,4 @@
 <br>
 <br>
 
-<% if !@period.users.include?(current_user) %>
-  <button class="js-more" data-id="<%= @period.id %>" data-type="<%=current_user.id%>">Click here to join this event.</button>
-<% end %>
-
-<script type="text/javascript" charset="utf-8">
-
-  $(function () {
-
-    $(".js-get").hide();
-
-    $('.prospectData').hide();
-
-    $('.name').on("click", function() {
-      var id = $(this).data("id");
-      $(`[data-user=${id}]`).show();
-
-    })
-
-
-    $(".js-more").on("click", function(event) {
-
-      var id = $(this).data("id");
-      var user = $(this).data("type");
-      $.ajax({
-        type: "POST",
-        url: '/period_users',
-        data: {'period_id': `${id}`, 'user_id': `${user}`}
-      });
-    });
-
-
-    $('.prospectShow').on("click", function() {
-      $('.prospectData').hide();
-      var id = $(this).data("gift");
-      $(`[data-prospect=${id}]`).show();
-    });
-
-    $('[src="http://www.clipartkid.com/images/721/wrapped-christmas-presents-wrapped-christmas-present-jpg-fy6Ii2-clipart.jpg"]').on("click", function() {
-      // debugger;
-      var gift = $(this).data("vote");
-      var user = $(this).data("img");
-      $.ajax({
-        type: "POST",
-        url: '/votes',
-        data: {'gift_id': `${gift}`, 'user_id': `${user}`, 'tally': '1'}
-      });
-      alert("Successfully upvoted, nice...");
-    });
-
-    $('[src="http://thehanovertheatre.org/images/header_image/1440432004_h_grinch900x650.jpg"]').on("click", function() {
-      // debugger;
-      var gift = $(this).data("vote");
-      var user = $(this).data("img");
-      $.ajax({
-        type: "POST",
-        url: '/votes',
-        data: {'gift_id': `${gift}`, 'user_id': `${user}`, 'tally': '-1'}
-      });
-      alert("Successfully downvoted, rude...");
-    });
-
-    $('.new_comment').submit(function(event) {
-      event.preventDefault();
-      var values = $(this).serialize();
-      var comment = $.post("/comments", values);
-      // debugger;
-      comment.done(function(response) {
-        // debugger;
-        t = response.text;
-        gift = response.gift_id;
-        var guy = $.get(`/users/${response.user_id}`);
-
-        guy.done(function(response) {
-          // debugger;
-          $(`#comments_${gift}`).append(`<h5>${response.name} says ${t}.</h5>`);
-          alert("Added your comment!");
-        });
-
-
-        // $(`#comments_`)
-      });
-    });
-
-    $(".new_gift").submit(function(event) {
-      event.preventDefault();
-      var values = $(this).serialize();
-      var posting = $.post("/gifts", values);
-      posting.done(function(response){
-        // debugger;
-        var gif = new Gift(response)
-        gif.appendToPage()
-        // $(`#gifts_${response.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${response.id}">${response.description}</button>`);
-        alert("Added your gift!");
-      });
-    });
-
-});
-
-    function Gift (response) {
-      this.description = response.description;
-      this.id = response.id;
-      this.link = response.link;
-      this.price = response.price;
-      this.recipient_id = response.recipient_id;
-      this.user_id = response.user_id;
-      this.period_id = response.period_id;
-    }
-
-    Gift.prototype.appendToPage = function() {
-      $(`#gifts_${this.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${this.id}">${this.description}</button>`);
-    }
-
-    // class Gift(){
-    //   constructor(response){
-    //     this.description = response.description;
-    //     this.id = response.id;
-    //     this.link = response.link;
-    //     this.price = response.price;
-    //     this.recipient_id = response.recipient_id;
-    //     this.user_id = response.user_id;
-    //   };
-    // }
-    //
-    // Gift.prototype.appendToPage = function(){
-    //   $(`#gifts_${this.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${this.id}">${this.description}</button>`);
-    // }
-
-
-  // class Gift(){
-  //   constructor(response){
-  //     this.description = response.description;
-  //     this.id = response.id;
-  //     this.link = response.link;
-  //     this.price = response.price;
-  //     this.recipient_id = response.recipient_id;
-  //     this.user_id = response.user_id;
-  //   };
-  //
-  //   appendToPage(){
-  //     $(`#gifts_${this.recipient_id}`).append(`<button type="button" class="prospectShow" data-gift="${this.id}">${this.description}</button>`);
-  //   };
-  // }
-
-  // Gift.prototype.appendToPage = function(){
-  //   some stuff
-  // }
-</script>
+<% end%>

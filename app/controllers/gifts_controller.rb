@@ -11,6 +11,12 @@ class GiftsController < ApplicationController
 
   end
 
+  def show
+    # binding.pry
+    @gift = Gift.find(params[:id])
+    render json: @gift, status: 201
+  end
+
   private
 
   def gift_params

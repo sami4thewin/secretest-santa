@@ -17,13 +17,15 @@ class PeriodsController < ApplicationController
 
   def index
     # binding.pry
+    # @period = Period.new
     @periods = Period.all
+    render json: @periods, status: 201
   end
 
   def destroy
     # binding.pry
     @period = Period.find(params[:id])
-    
+
 
     @period.destroy
 
